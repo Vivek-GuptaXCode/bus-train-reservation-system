@@ -1,103 +1,226 @@
 import React, { useState } from 'react';
 
-// Simple reports page - TODO: implement actual report data fetching
-// For now just shows placeholder report summaries
+// Reports Dashboard for admins
+// Shows occupancy, revenue, cancellations, and refunds reports
+// TODO: connect to report API endpoints when available
 const ReportsPage = () => {
-  const [reportType, setReportType] = useState('');
+  // tab state: 'occupancy' | 'revenue' | 'cancellations' | 'refunds'
+  const [activeTab, setActiveTab] = useState('occupancy');
 
-  const reportOptions = [
-    { value: 'bookings', label: 'Booking Report' },
-    { value: 'revenue', label: 'Revenue Report' },
-    { value: 'occupancy', label: 'Occupancy Report' },
-    { value: 'cancellations', label: 'Cancellation Report' },
-  ];
+  // date range filters for generating reports
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
-  // Mock data for demonstration
-  const mockSummary = {
-    totalBookings: 245,
-    totalRevenue: '₹1,25,430',
-    averageOccupancy: '78%',
-    cancellations: 12,
+  // each tab has its own generate state
+  const [generated, setGenerated] = useState({
+    occupancy: false,
+    revenue: false,
+    cancellations: false,
+    refunds: false,
+  });
+
+  // switch between tabs
+  const switchTab = (tab) => {
+    setActiveTab(tab);
   };
 
-  return (
-    <div style={{ padding: '20px 0' }}>
-      <h2 className="page-title">Reports</h2>
+  // simulate generating a report
+  const handleGenerate = () => {
+    if (!startDate || !endDate) {
+      alert('Please select both start and end dates.');
+      return;
+    }
+    setGenerated((prev) => ({ ...prev, [activeTab]: true }));
+  };
 
-      {/* Quick Stats Cards */}
-      <div className="flex-row" style={{ marginBottom: '20px' }}>
-        <div className="card" style={{ flex: 1, textAlign: 'center' }}>
-          <h3 style={{ color: '#007bff' }}>245</h3>
-          <p>Total Bookings</p>
-        </div>
-        <div className="card" style={{ flex: 1, textAlign: 'center' }}>
-          <h3 style={{ color: '#28a745' }}>₹1,25,430</h3>
-          <p>Total Revenue</p>
-        </div>
-        <div className="card" style={{ flex: 1, textAlign: 'center' }}>
-          <h3 style={{ color: '#17a2b8' }}>78%</h3>
-          <p>Average Occupancy</p>
-        </div>
-        <div className="card" style={{ flex: 1, textAlign: 'center' }}>
-          <h3 style={{ color: '#dc3545' }}>12</h3>
-          <p>Cancellations</p>
+  // tab button style helper
+  const tabBtnStyle = (tab) => ({
+    padding: '10px 20px',
+    border: 'none',
+    cursor: 'pointer',
+    background: activeTab === tab ? '#1a237e' : '#e0e0e0',
+    color: activeTab === tab ? 'white' : '#333',
+    borderRadius: '4px',
+    marginRight: '8px',
+    fontWeight: activeTab === tab ? 600 : 400,
+  });
+
+  return (
+    <div className="container" style={{ padding: '20px 0' }}>
+      <h2 className="page-title">Reports Dashboard</h2>
+
+      {/* Tab Buttons */}
+      <div style={{ marginBottom: '20px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+        <button style={tabBtnStyle('occupancy')} onClick={() => switchTab('occupancy')}>
+          Occupancy
+        </button>
+        <button style={tabBtnStyle('revenue')} onClick={() => switchTab('revenue')}>
+          Revenue
+        </button>
+        <button style={tabBtnStyle('cancellations')} onClick={() => switchTab('cancellations')}>
+          Cancellations
+        </button>
+        <button style={tabBtnStyle('refunds')} onClick={() => switchTab('refunds')}>
+          Refunds
+        </button>
+      </div>
+
+      {/* Date Range Filter (shared across tabs) */}
+      <div className="card" style={{ marginBottom: '20px' }}>
+        <h3 style={{ marginBottom: '10px' }}>Date Range Filter</h3>
+        <div style={{ display: 'flex', gap: '15px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label>Start Date</label>
+            <input
+              type="date"
+              className="form-control"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              style={{ width: '180px' }}
+            />
+          </div>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label>End Date</label>
+            <input
+              type="date"
+              className="form-control"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              style={{ width: '180px' }}
+            />
+          </div>
+          <button className="btn btn-primary" onClick={handleGenerate} style={{ height: 'fit-content' }}>
+            Generate Report
+          </button>
         </div>
       </div>
 
-      {/* Report Type Selector */}
+      {/* Tab Content */}
       <div className="card">
-        <h3>Generate Report</h3>
-        <div className="form-group">
-          <label>Report Type</label>
-          <select className="form-control" value={reportType} onChange={(e) => setReportType(e.target.value)}>
-            <option value="">-- Select Report Type --</option>
-            {reportOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Occupancy Report Tab */}
+        {activeTab === 'occupancy' && (
+          <div>
+            <h3 style={{ marginBottom: '15px' }}>Occupancy Report</h3>
+            {generated.occupancy ? (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Route</th>
+                    <th>Service</th>
+                    <th>Run ID</th>
+                    <th>Date</th>
+                    <th>Capacity</th>
+                    <th>Booked</th>
+                    <th>Occupancy %</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
+                      Report data will appear here.
+                      {/* TODO: connect to report API endpoints for occupancy data */}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            ) : (
+              <p style={{ color: '#666' }}>
+                Select a date range and click "Generate Report" to view occupancy data.
+              </p>
+            )}
+          </div>
+        )}
 
-        {reportType && (
-          <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '5px' }}>
-            <p><strong>{reportOptions.find((o) => o.value === reportType)?.label}</strong></p>
-            <p style={{ color: '#666' }}>
-              This report would fetch data from the backend API and display it here.
-              {/* FIXME: implement actual report fetching logic */}
-            </p>
+        {/* Revenue Report Tab */}
+        {activeTab === 'revenue' && (
+          <div>
+            <h3 style={{ marginBottom: '15px' }}>Revenue Report</h3>
+            {generated.revenue ? (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Route</th>
+                    <th>Date</th>
+                    <th>Received Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colSpan={3} style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
+                      Report data will appear here.
+                      {/* TODO: connect to report API endpoints for revenue data */}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            ) : (
+              <p style={{ color: '#666' }}>
+                Select a date range and click "Generate Report" to view revenue data.
+              </p>
+            )}
+          </div>
+        )}
 
-            {/* Mock table for demonstration */}
-            <table style={{ marginTop: '10px' }}>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Service</th>
-                  <th>Bookings</th>
-                  <th>Revenue</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>2024-01-15</td>
-                  <td>Mumbai-Pune Express</td>
-                  <td>42</td>
-                  <td>₹21,000</td>
-                </tr>
-                <tr>
-                  <td>2024-01-16</td>
-                  <td>Delhi-Agra Shatabdi</td>
-                  <td>38</td>
-                  <td>₹19,500</td>
-                </tr>
-                <tr>
-                  <td>2024-01-17</td>
-                  <td>Bangalore-Chennai Mail</td>
-                  <td>55</td>
-                  <td>₹27,800</td>
-                </tr>
-              </tbody>
-            </table>
+        {/* Cancellations Report Tab */}
+        {activeTab === 'cancellations' && (
+          <div>
+            <h3 style={{ marginBottom: '15px' }}>Cancellations Report</h3>
+            {generated.cancellations ? (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cancellation ID</th>
+                    <th>Date</th>
+                    <th>Reason</th>
+                    <th>Ticket ID</th>
+                    <th>Booking ID</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colSpan={5} style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
+                      Report data will appear here.
+                      {/* TODO: connect to report API endpoints for cancellations data */}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            ) : (
+              <p style={{ color: '#666' }}>
+                Select a date range and click "Generate Report" to view cancellation data.
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Refunds Report Tab */}
+        {activeTab === 'refunds' && (
+          <div>
+            <h3 style={{ marginBottom: '15px' }}>Refunds Report</h3>
+            {generated.refunds ? (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Refund ID</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colSpan={4} style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
+                      Report data will appear here.
+                      {/* TODO: connect to report API endpoints for refunds data */}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            ) : (
+              <p style={{ color: '#666' }}>
+                Select a date range and click "Generate Report" to view refund data.
+              </p>
+            )}
           </div>
         )}
       </div>
