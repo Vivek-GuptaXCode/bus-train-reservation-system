@@ -7,9 +7,7 @@ const policy = require('../../config/policy');
 
 // TODO: Use configurable refund policy instead of hardcoded 50%
 
-/**
- * Get a ticket by ID with all related info JOINed
- */
+// get a ticket by ID with all related info JOINed
 async function getTicketById(ticketId) {
   const result = await pool.query(
     `SELECT
@@ -51,9 +49,7 @@ async function getTicketById(ticketId) {
   return result.rows[0];
 }
 
-/**
- * Get e-ticket for a ticket
- */
+// get e-ticket for a ticket
 async function getETicket(ticketId) {
   // First check ticket exists
   const ticketCheck = await pool.query(
@@ -79,14 +75,7 @@ async function getETicket(ticketId) {
   return result.rows[0];
 }
 
-/**
- * Cancel a ticket - simplified implementation
- * WIP/placeholder for the full cancellation flow
- *
- * @param {number} ticketId
- * @param {string} reason - Cancellation reason
- * @param {number} userId - The user who is cancelling
- */
+// cancel a ticket - WIP, will finish this later
 async function cancelTicket(ticketId, reason, userId) {
   // Use a client for transaction
   const client = await pool.connect();
@@ -125,8 +114,9 @@ async function cancelTicket(ticketId, reason, userId) {
     }
 
     // Step 3: Check service run hasn't departed yet
-    const now = new Date();
-    const departureTime = new Date(ticket.departure_time);
+    var now = new Date();
+    var departureTime = new Date(ticket.departure_time);
+    // console.log('debug: now=', now, 'departure=', departureTime);
 
     if (now >= departureTime) {
       throw badRequest('Cannot cancel ticket: service run has already departed');
@@ -134,7 +124,9 @@ async function cancelTicket(ticketId, reason, userId) {
 
     // Step 4: Calculate refund amount
     // Simple refund: 50% of fare (simplified for now)
-    // TODO: Use configurable refund policy instead of hardcoded 50%
+// TODO: Use configurable refund policy instead of hardcoded 50%
+// FIXME: this might break if departure time is in the past
+// TODO: add better error handling for edge cases
     const refundPercentage = 50;
     const refundAmount = parseFloat(
       (parseFloat(ticket.fare_amount) * refundPercentage / 100).toFixed(2)

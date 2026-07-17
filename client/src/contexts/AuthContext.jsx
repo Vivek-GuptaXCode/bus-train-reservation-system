@@ -1,10 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { login as loginApi, register as registerApi, getMe } from '../api/authApi';
 
-// create the auth context
+// got this pattern from a react tutorial on youtube lol
+// create the auth context - this is basically global state
 const AuthContext = createContext(null);
 
 // hook to use auth context in any component
+// throwing an error if someone uses it outside provider (saw this in a tutorial)
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
@@ -20,15 +22,16 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null);
 
   // check if user is already logged in when app loads
+  // we store token + user in localStorage so they don't have to login every time
   useEffect(() => {
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
 
     if (token && savedUser) {
-      // we have a token and saved user, verify it's still valid
+      // we have a token, so just try to refresh from server
       setUser(JSON.parse(savedUser));
 
-      // try to refresh user data from server
+      // verify the token is still good
       getMe()
         .then((res) => {
           if (res.success && res.data) {
@@ -36,7 +39,8 @@ export function AuthProvider({ children }) {
             localStorage.setItem('user', JSON.stringify(res.data));
           }
         })
-        .catch(() => {
+        .catch((err) => {
+          // console.log('token expired probably', err);
           // token might be expired, clear everything
           localStorage.removeItem('token');
           localStorage.removeItem('user');
@@ -51,7 +55,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   // login function - calls API and saves token
-  const login = useCallback(async (name, password) => {
+  // TODO: should add proper validation here maybe
+  const login = async (name, password) => {
     setError(null);
     setIsLoading(true);
 
@@ -68,7 +73,7 @@ export function AuthProvider({ children }) {
         setUser(userData);
         return userData;
       } else {
-        throw new Error(res.message || 'Login failed');
+        throw new Error(res.message || 'Login failed somehow');
       }
     } catch (err) {
       const msg = err.response?.data?.error?.message || err.message || 'Login failed';
@@ -77,10 +82,10 @@ export function AuthProvider({ children }) {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
-  // register function - creates account then returns
-  const registerUser = useCallback(async (data) => {
+  // register function - creates account then returns user data
+  const registerUser = async (data) => {
     setError(null);
     setIsLoading(true);
 
@@ -99,19 +104,22 @@ export function AuthProvider({ children }) {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
-  // logout - clear everything
-  const logout = useCallback(() => {
+  // logout - just clears everything from state and localStorage
+  const logout = () => {
+    // console.log('logging out user:', user?.name);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
     setError(null);
-  }, []);
+  };
 
   // this is what components will get when they call useAuth()
+  // added isAuthenticated cuz the navbar kept showing login link even after login lol
   const value = {
     user,
+    isAuthenticated: !!user,
     login,
     logout,
     register: registerUser,

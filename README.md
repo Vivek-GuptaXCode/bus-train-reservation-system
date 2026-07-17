@@ -1,130 +1,109 @@
 # Bus and Train Reservation System
 
-A full-stack reservation system built with **PostgreSQL, Express.js, React, and Node.js** (PERN stack) as part of a DBMS academic project.
+DBMS project built with PERN stack (PostgreSQL, Express, React, Node.js). This project is for our university database course.
 
-## Project Status
+## What's Working So Far
 
-> This project is currently **in progress**. Core database schema, authentication, master data management, service search, and seat availability functionality are implemented. Booking transactions and reporting are under development.
-
-## Tech Stack
-
-| Layer    | Technology                    |
-| -------- | ----------------------------- |
-| Database | PostgreSQL                    |
-| Backend  | Node.js + Express.js          |
-| Frontend | React (Vite)                  |
-| Auth     | JWT + bcryptjs                |
-
-## Features Implemented
-
-- User registration/login with role-based access (Passenger, Booking Clerk, Operations Staff, Administrator)
-- Route and route-stop management (CRUD)
-- Transport and seat management with capacity validation
-- Service and service-run creation with type-compatibility checks
-- Service search by source, destination, and travel date
-- Leg-wise seat availability display
+- User registration and login (with JWT tokens)
+- Role-based access: Passenger, Booking Clerk, Operations Staff, Administrator
+- Route and stop management (add/edit/delete)
+- Transport management with seat generation
+- Service and service-run creation
+- Search for trips between any two stops on a given date
+- Seat availability view (shows which seats are free for your segment)
 - Booking creation with payment recording
-- Ticket and e-ticket generation
-- Ticket cancellation with refund calculation
-- Database triggers for referential integrity
-- RESTful API with input validation
+- Tickets and e-tickets (kinda basic rn)
+- Cancellation with partial refund
+
+## Still Needs Work (TODOs)
+
+- [ ] Proper seat locking to prevent double booking (right now it's just a simple check)
+- [ ] Six-ticket limit per person per service run
+- [ ] Connect admin reports to actual API data (currently just placeholder UI)
+- [ ] Generate actual PDF e-tickets (right now it stores URLs but doesn't generate files)
+- [ ] File upload for ID documents
+- [ ] Rate limiting on login
+- [ ] Better error handling in some places
+- [ ] Fix the constants - role names don't match between code and database lol
+
+## Setup (if you want to run it)
+
+You need Node.js 18+ and PostgreSQL 14+ installed.
+
+```bash
+git clone https://github.com/Vivek-GuptaXCode/bus-train-reservation-system.git
+cd bus-train-reservation-system
+
+# install everything
+npm run install:all
+
+# copy the env file and put your own values
+cp .env.example .env
+
+# set up database
+npm run migrate
+npm run seed
+
+# run both server and client
+npm run dev
+```
+
+The server runs on port 5000 and the React app on port 5173.
+
+## Default Login
+
+username: admin  
+password: admin123  
+role: Administrator
+
+(other users are in the seed file, check database/seeds/001_seed_data.sql)
 
 ## Project Structure
 
 ```
 bus-train-reservation-system/
-├── client/                    # React frontend (Vite)
+├── client/            # React frontend (built with Vite)
 │   └── src/
-│       ├── api/               # API client modules
-│       ├── app/               # App entry and routing
-│       ├── components/        # Reusable components
-│       ├── contexts/          # React contexts (Auth)
-│       └── pages/             # Page components
-├── server/                    # Express.js backend
+│       ├── api/       # API call functions
+│       ├── components/# Reusable UI parts
+│       ├── contexts/  # Auth context for login state
+│       └── pages/     # All the page components
+├── server/            # Express API backend
 │   └── src/
-│       ├── config/            # Environment and policy config
-│       ├── db/                # Database pool and migrations
-│       ├── middleware/        # Auth, validation, error handling
-│       ├── modules/           # Route handlers and services
-│       └── shared/            # Shared utilities
+│       ├── config/    # Environment and business rules
+│       ├── db/        # Database connection and migration scripts
+│       ├── middleware/ # Auth, validation, error handling
+│       ├── modules/   # Route handlers and database queries
+│       └── shared/    # Error classes and constants
 ├── database/
-│   ├── migrations/            # SQL schema files
-│   └── seeds/                 # Seed data
-└── storage/                   # Uploaded documents and e-tickets
+│   ├── migrations/    # SQL to create all tables
+│   └── seeds/         # Sample data for testing
+└── storage/           # Uploaded docs and e-tickets (empty for now)
 ```
 
-## Getting Started
+## API Endpoints (main ones)
 
-### Prerequisites
+Everything is under `/api/v1`:
 
-- Node.js 18+
-- PostgreSQL 14+
-- npm
+- POST `/auth/register` - sign up
+- POST `/auth/login` - get token
+- GET `/auth/me` - current user info
+- GET `/routes` - list all routes
+- POST `/routes` - create route (ops/admin only)
+- GET `/search/service-runs?boardingStopId=X&disembarkingStopId=Y&travelDate=Z` - find trips
+- GET `/service-runs/:id/seats` - view seat map
+- POST `/bookings/confirm` - book tickets
+- POST `/tickets/:id/cancel` - cancel a ticket
 
-### Setup
+There are more endpoints for managing transports, services, and service runs. Check the route files in server/src/modules/ for details.
 
-```bash
-# Clone the repository
-git clone https://github.com/Vivek-GuptaXCode/bus-train-reservation-system.git
-cd bus-train-reservation-system
+## Database
 
-# Install dependencies
-npm run install:all
+16 tables with foreign keys and triggers. The schema is in `database/migrations/001_initial_schema.sql`. Used ChatGPT and some YouTube tutorials to figure out the triggers for transport-service type matching.
 
-# Copy environment config
-cp .env.example .env
-# Edit .env with your database credentials and secrets
+## Notes
 
-# Set up the database
-npm run migrate
-npm run seed
-
-# Start development servers
-npm run dev
-```
-
-### Default Users (from seed data)
-
-| Username  | Password   | Role              |
-| --------- | ---------- | ----------------- |
-| passenger | pass123    | Passenger         |
-| clerk     | clerk123   | Booking Clerk     |
-| ops       | ops123     | Operations Staff  |
-| admin     | admin123   | Administrator     |
-
-## API Endpoints
-
-Base URL: `/api/v1`
-
-| Method | Endpoint                        | Access        | Description            |
-| ------ | ------------------------------- | ------------- | ---------------------- |
-| POST   | /auth/register                  | Public        | Register new user      |
-| POST   | /auth/login                     | Public        | Login and get JWT      |
-| GET    | /auth/me                        | Authenticated | Get current user       |
-| GET    | /routes                         | Authenticated | List routes            |
-| POST   | /routes                         | Ops, Admin    | Create route           |
-| GET    | /search/service-runs            | Passenger+   | Search services        |
-| GET    | /service-runs/:id/seats         | Passenger+   | View seat availability |
-| POST   | /bookings/confirm               | Passenger+   | Confirm booking        |
-| GET    | /bookings/:id                   | Owner+       | View booking           |
-| POST   | /tickets/:id/cancel             | Owner+       | Cancel ticket          |
-
-## Database Schema
-
-The system uses 16 relational tables with full referential integrity:
-
-`role` → `user_account` → `passenger` → `booking` → `ticket` → `e_ticket`
-
-`route` → `route_stop` (used by booking for boarding/disembarking)
-
-`service` → `service_run` (linked to tickets and transport)
-
-`transport` → `seat` (assigned per ticket)
-
-`booking` → `payment`, `identification_document`
-
-`ticket` → `cancellation` → `refund`
-
-## License
-
-This project is created for academic purposes as part of a DBMS course.
+- This is an academic project, not production code
+- Some parts are simplified on purpose (we haven't covered everything in class yet)
+- The booking doesn't do proper concurrency locking - it'll fail if two people try to book the same seat at once
+- Planning to fix that before the final submission

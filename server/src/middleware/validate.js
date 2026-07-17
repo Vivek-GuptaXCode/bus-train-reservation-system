@@ -3,14 +3,7 @@
 
 const { badRequest } = require('../shared/errors');
 
-/**
- * Validation middleware factory.
- * Validates request body (or params/query) against a Joi schema.
- *
- * @param {Object} schema - Joi validation schema
- * @param {string} source - Where to get the data from: 'body', 'params', or 'query'
- * @returns {Function} Express middleware
- */
+// validate function - uses Joi to check request data
 function validate(schema, source) {
   // Default to validating the request body
   var dataSource = source || 'body';

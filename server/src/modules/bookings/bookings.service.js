@@ -8,20 +8,10 @@ const { notFound, badRequest, conflict } = require('../../shared/errors');
 
 // TODO: Add seat locking and concurrency handling
 // TODO: Implement six-ticket rule check
+// TODO: add better error handling
+// FIXME: this might break if passengerId is null
 
-/**
- * Create a booking with payment and tickets.
- * Simplified implementation for demo purposes.
- *
- * @param {Object} data
- * @param {number} data.passengerId - p_id of the passenger
- * @param {number} data.serviceRunId
- * @param {number} data.boardingStopId
- * @param {number} data.disembarkingStopId
- * @param {number[]} data.seatIds - Array of seat IDs to book
- * @param {string} data.paymentTransactionId - Transaction ID from payment
- * @param {string} data.paymentMode - Payment mode (Online, Cash, etc.)
- */
+// creates a new booking - simplified version, will add locks later
 async function createBooking(data) {
   const {
     passengerId,
@@ -89,8 +79,8 @@ async function createBooking(data) {
 
     // Step 3: Simple seat availability check (will be enhanced later for overlap checks)
     // For now, just check that seats exist and belong to the right transport
-    for (let i = 0; i < seatIds.length; i++) {
-      const seatId = seatIds[i];
+    for (var i = 0; i < seatIds.length; i++) {
+      var seatId = seatIds[i];
 
       const seatResult = await client.query(
         `SELECT s.seat_id, s.seat_no, s.transport_id
@@ -156,8 +146,10 @@ async function createBooking(data) {
     const boardingInfo = segment.boarding_stop_name + ' (Stop #' + segment.boarding_sequence + ')';
     const disembarkingInfo = segment.disembarking_stop_name + ' (Stop #' + segment.destination_sequence + ')';
 
+    // console.log('debug: inserting tickets for booking');
+
     for (let i = 0; i < seatIds.length; i++) {
-      const seatId = seatIds[i];
+      var seatId = seatIds[i];
 
       const ticketResult = await client.query(
         `INSERT INTO ticket (fare_amount, boarding_info, disembarking_info, booking_id, service_run_id, seat_id)
@@ -185,9 +177,7 @@ async function createBooking(data) {
   }
 }
 
-/**
- * Get a booking by ID with all related data JOINed
- */
+// get booking by ID with all related data JOINed
 async function getBookingById(bookingId) {
   const result = await pool.query(
     `SELECT
@@ -242,9 +232,7 @@ async function getBookingById(bookingId) {
   return booking;
 }
 
-/**
- * Get all bookings for a passenger, ordered by date descending
- */
+// get all bookings for a passenger, ordered by date descending
 async function getPassengerBookings(passengerId) {
   const result = await pool.query(
     `SELECT

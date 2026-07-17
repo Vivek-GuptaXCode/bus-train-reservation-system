@@ -3,19 +3,7 @@
 
 const pool = require('./pool');
 
-/**
- * Runs a callback inside a database transaction.
- * If the callback succeeds, commits. If it throws, rolls back.
- *
- * Example usage:
- *   withTransaction(async (client) => {
- *     await client.query('INSERT INTO ...');
- *     await client.query('UPDATE ...');
- *   });
- *
- * @param {Function} callback - Async function that receives a pg client
- * @returns {Promise} Whatever the callback returns
- */
+// runs a callback inside a database transaction - commits on success, rolls back on error
 async function withTransaction(callback) {
   // Get a client from the pool
   const client = await pool.connect();

@@ -3,13 +3,7 @@
 
 const { AppError } = require('../shared/errors');
 
-/**
- * Global error handling middleware.
- * This is the last middleware in the chain - it catches anything that
- * gets thrown or passed to next(error).
- *
- * Must have 4 parameters so Express knows it's an error handler.
- */
+// this catches all errors and sends them as JSON
 function errorHandler(err, req, res, next) {
   // Figure out what kind of error this is
   var statusCode;

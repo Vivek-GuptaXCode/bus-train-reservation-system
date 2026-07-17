@@ -4,10 +4,11 @@
 const { Pool } = require('pg');
 const config = require('../config/env');
 
-// Create a new pool with the database URL from config
-const pool = new Pool({
+  // Create a new pool with the database URL from config
+var pool = new Pool({
   connectionString: config.DATABASE_URL,
   // TODO: add ssl config for production
+  // FIXME: this might break if DATABASE_URL has special chars
 });
 
 // Log any errors from idle clients
@@ -17,14 +18,7 @@ pool.on('error', function (err) {
   // Don't crash the server, just log it
 });
 
-/**
- * Helper to run a query with automatic client acquisition and release.
- * This is the main way to talk to the database.
- *
- * @param {string} text - The SQL query text
- * @param {Array} params - Query parameters for parameterized queries
- * @returns {Promise} Query result from pg
- */
+// helper to run a query - this is the main way to talk to the database
 async function query(text, params) {
   // Just delegate to the pool - pg handles everything
   var start = Date.now();

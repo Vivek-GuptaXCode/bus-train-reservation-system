@@ -1,29 +1,27 @@
 import httpClient from './httpClient';
 
-/**
- * Search for available service runs matching the criteria
- */
-export const searchServiceRuns = async (params) => {
-  const response = await httpClient.get('/search/service-runs', {
+// search for available trips based on from stop, to stop, and date
+// this calls the backend search endpoint which queries the database
+export const searchServiceRuns = (params) => {
+  // console.log('searching with params:', params); // for debugging
+  return httpClient.get('/search/service-runs', {
     params: {
       boardingStopId: params.boardingStopId,
       disembarkingStopId: params.disembarkingStopId,
       travelDate: params.travelDate,
       passengerCount: params.passengerCount,
     },
-  });
-  return response.data;
+  }).then(res => res.data);
 };
 
-/**
- * Get seat availability for a specific service run between two stops
- */
+// get which seats are free/occupied for a service run between two stops
+// TODO: this endpoint might be slow with lots of data, maybe add caching?
 export const getSeatAvailability = async (serviceRunId, boardingStopId, disembarkingStopId) => {
-  const response = await httpClient.get(`/search/service-runs/${serviceRunId}/seats`, {
+  const res = await httpClient.get(`/search/service-runs/${serviceRunId}/seats`, {
     params: {
       boardingStopId,
       disembarkingStopId,
     },
   });
-  return response.data;
+  return res.data;
 };

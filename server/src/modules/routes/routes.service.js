@@ -4,9 +4,8 @@
 const pool = require('../../db/pool');
 const { notFound, conflict } = require('../../shared/errors');
 
-/**
- * Get all routes, ordered by name
- */
+// TODO: add better error handling
+// get all routes, ordered by name
 async function getAllRoutes() {
   const result = await pool.query(
     'SELECT * FROM route ORDER BY route_name'
@@ -14,9 +13,7 @@ async function getAllRoutes() {
   return result.rows;
 }
 
-/**
- * Get a single route by ID, including its stops
- */
+// get a single route by ID, including its stops
 async function getRouteById(routeId) {
   // First get the route itself
   const routeResult = await pool.query(
@@ -42,10 +39,7 @@ async function getRouteById(routeId) {
   return route;
 }
 
-/**
- * Create a new route
- * @param {Object} data - { route_name, total_distance }
- */
+// create a new route
 async function createRoute(data) {
   const { route_name, total_distance } = data;
 
@@ -59,9 +53,7 @@ async function createRoute(data) {
   return result.rows[0];
 }
 
-/**
- * Update an existing route
- */
+// update an existing route
 async function updateRoute(routeId, updates) {
   // Check route exists first
   const checkResult = await pool.query(
@@ -107,9 +99,7 @@ async function updateRoute(routeId, updates) {
   return result.rows[0];
 }
 
-/**
- * Get all stops for a route, ordered by stop_sequence
- */
+// get all stops for a route, ordered by stop_sequence
 async function getRouteStops(routeId) {
   // Check route exists
   const routeCheck = await pool.query(
@@ -129,11 +119,7 @@ async function getRouteStops(routeId) {
   return result.rows;
 }
 
-/**
- * Create a new route stop for a route
- * @param {number} routeId
- * @param {Object} data - { stop_name, stop_sequence, distance_from_origin, arrival_time, departure_time }
- */
+// create a new route stop for a route
 async function createRouteStop(routeId, data) {
   const { stop_name, stop_sequence, distance_from_origin, arrival_time, departure_time } = data;
 
@@ -157,9 +143,7 @@ async function createRouteStop(routeId, data) {
   return result.rows[0];
 }
 
-/**
- * Update an existing route stop
- */
+// update an existing route stop
 async function updateRouteStop(routeStopId, updates) {
   // Check stop exists
   const checkResult = await pool.query(
@@ -219,10 +203,7 @@ async function updateRouteStop(routeStopId, updates) {
   return result.rows[0];
 }
 
-/**
- * Delete a route stop.
- * Only allowed if no bookings reference this stop.
- */
+// delete a route stop - only allowed if no bookings reference it
 async function deleteRouteStop(routeStopId) {
   // Check stop exists
   const checkResult = await pool.query(

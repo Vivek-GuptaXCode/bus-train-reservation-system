@@ -5,12 +5,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/env');
 const { unauthorized } = require('../shared/errors');
 
-/**
- * Authentication middleware.
- * Reads the JWT from the Authorization header and verifies it.
- * If valid, attaches the decoded user info to req.user.
- * If invalid or missing, sends a 401 response.
- */
+// checks JWT token in Authorization header
 function authenticate(req, res, next) {
   // check if token is there
   var authHeader = req.headers.authorization;

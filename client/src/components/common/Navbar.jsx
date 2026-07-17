@@ -6,18 +6,25 @@ const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
+  // handle logout click - clears auth and sends to login page
   const handleLogout = () => {
+    // console.log('user clicked logout');
     logout();
     navigate('/login');
   };
 
-  // Helper to check user role
+  // helper to check what role the user has
+  // if no user, it's empty string so checks will fail safely
   const userRole = user?.role || '';
+
+  // some inline styles cuz i didnt want to make a whole css file for navbar lol
+  const brandStyle = { color: 'white', textDecoration: 'none', fontWeight: 'bold' };
+  const pillStyle = { padding: '5px 10px', fontSize: '13px', borderRadius: '4px' };
 
   return (
     <nav className="navbar">
       <div className="brand">
-        <NavLink to="/" style={{ color: 'white', textDecoration: 'none' }}>
+        <NavLink to="/" style={brandStyle}>
           Bus &amp; Train Reservation
         </NavLink>
       </div>
@@ -31,7 +38,7 @@ const Navbar = () => {
         ) : (
           <>
             {/* Show user name and role */}
-            <span style={{ marginRight: '10px' }}>
+            <span style={{ marginRight: '10px', color: '#e0e0e0' }}>
               {user?.name} ({userRole})
             </span>
 
@@ -40,7 +47,7 @@ const Navbar = () => {
               <NavLink to="/search">Search</NavLink>
             )}
 
-            {/* Passenger-specific links */}
+            {/* Passenger specific stuff */}
             {userRole === 'Passenger' && (
               <NavLink to="/passenger/bookings">My Bookings</NavLink>
             )}
@@ -50,7 +57,7 @@ const Navbar = () => {
               <NavLink to="/clerk/bookings/new">New Booking</NavLink>
             )}
 
-            {/* Operations Staff and Admin can manage operations */}
+            {/* Ops Staff and Admin manage operations */}
             {(userRole === 'Operations Staff' || userRole === 'Admin') && (
               <>
                 <NavLink to="/operations/routes">Routes</NavLink>
@@ -59,12 +66,13 @@ const Navbar = () => {
               </>
             )}
 
-            {/* Reports for admin only */}
+            {/* Admin only - reports page */}
+            {/* TODO: add more report types, currently only basic stuff */}
             {userRole === 'Admin' && (
               <NavLink to="/reports">Reports</NavLink>
             )}
 
-            <button className="btn btn-danger" onClick={handleLogout} style={{ padding: '5px 10px', fontSize: '13px' }}>
+            <button className="btn btn-danger" onClick={handleLogout} style={pillStyle}>
               Logout
             </button>
           </>

@@ -2,7 +2,7 @@ import React from 'react';
 
 /**
  * SearchForm - lets user pick boarding stop, destination stop, date, and passenger count
- * This is a simple form - the actual stop data comes from the parent component
+ * This form gets the stops list from the parent and sends search params up on submit
  */
 function SearchForm({ 
   stops, 
@@ -17,8 +17,7 @@ function SearchForm({
   onSubmit,
   disabledStops 
 }) {
-  // filter destination stops to only show stops after the selected boarding stop
-  // based on the stop sequence
+  // figure out which stops are valid destinations (only stops AFTER the boarding stop)
   const getDestinationStops = () => {
     if (!boardingStopId || !stops || stops.length === 0) return stops;
 
@@ -26,15 +25,18 @@ function SearchForm({
     if (!selectedStop) return stops;
 
     // only show stops with a higher sequence number
+    // so you can't accidentally go backwards
     return stops.filter(s => s.sequence_number > selectedStop.sequence_number);
   };
 
   const destinationStops = getDestinationStops();
 
+  // FIXME: min date doesn't account for timezone differences
+
   return (
     <div className="card">
       <div className="flex-row">
-        {/* boarding stop dropdown */}
+        {/* boarding stop */}
         <div className="form-group" style={{ flex: 1 }}>
           <label>From (Boarding Stop)</label>
           <select
@@ -42,8 +44,8 @@ function SearchForm({
             value={boardingStopId}
             onChange={(e) => {
               setBoardingStopId(e.target.value);
-              // reset destination when boarding changes
-              setDisembarkingStopId('');
+              setDisembarkingStopId(''); // reset dest when boarding changes
+              // console.log('selected boarding stop:', e.target.value);
             }}
           >
             <option value="">-- Select Boarding Stop --</option>
@@ -55,7 +57,7 @@ function SearchForm({
           </select>
         </div>
 
-        {/* destination stop dropdown */}
+        {/* destination stop - disabled until boarding is picked */}
         <div className="form-group" style={{ flex: 1 }}>
           <label>To (Destination Stop)</label>
           <select
@@ -73,7 +75,7 @@ function SearchForm({
           </select>
         </div>
 
-        {/* travel date */}
+        {/* date picker */}
         <div className="form-group" style={{ flex: 1 }}>
           <label>Travel Date</label>
           <input
@@ -85,7 +87,7 @@ function SearchForm({
           />
         </div>
 
-        {/* passenger count */}
+        {/* how many passengers? */}
         <div className="form-group" style={{ flex: 0.5 }}>
           <label>Passengers</label>
           <input
@@ -98,7 +100,7 @@ function SearchForm({
           />
         </div>
 
-        {/* search button */}
+        {/* the search button */}
         <div className="form-group" style={{ flex: 0.3, alignSelf: 'flex-end' }}>
           <button className="btn btn-primary" onClick={onSubmit} style={{ width: '100%' }}>
             Search

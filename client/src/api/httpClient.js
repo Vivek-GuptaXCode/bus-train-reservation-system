@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-// Create axios instance with base URL pointing to our backend API
+// creating axios instance for our backend
+// baseURL is /api/v1 cuz that's where our express server handles api requests
 const httpClient = axios.create({
   baseURL: '/api/v1',
   headers: {
@@ -8,11 +9,13 @@ const httpClient = axios.create({
   },
 });
 
-// Add token to every request if we have one
+// attach token to every request if the user is logged in
 // TODO: maybe refresh token if it's about to expire
+// TODO: figure out why sometimes the token is undefined even though login worked
 httpClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+    // console.log('sending token:', token); // debug - remove later
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -23,7 +26,7 @@ httpClient.interceptors.request.use(
   }
 );
 
-// Handle 401 responses - user needs to log in again
+// if we get 401 it means token is invalid/expired, kick user to login
 httpClient.interceptors.response.use(
   (response) => response,
   (error) => {

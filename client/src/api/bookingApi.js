@@ -1,42 +1,37 @@
 import httpClient from './httpClient';
 
-/**
- * Confirm a booking (create booking + tickets)
- * @param {Object} data - booking payload with selected seats, passenger info, etc.
- */
-export const confirmBooking = async (data) => {
-  const response = await httpClient.post('/bookings/confirm', data);
-  return response.data;
+// FIXME: need to handle what happens when booking fails partway through
+// like what if payment goes through but ticket generation fails?
+
+// confirm a booking - this creates booking + tickets together
+// data should have selected seats, passenger info, service run info, etc
+export const confirmBooking = (data) => {
+  // console.log('confirming booking with data:', data);
+  return httpClient.post('/bookings/confirm', data)
+    .then(res => res.data);
 };
 
-/**
- * Get a booking by its ID
- */
+// get booking details by id
 export const getBooking = async (id) => {
-  const response = await httpClient.get(`/bookings/${id}`);
-  return response.data;
+  const res = await httpClient.get(`/bookings/${id}`);
+  return res.data;
 };
 
-/**
- * Get all bookings for a specific passenger
- */
-export const getPassengerBookings = async (passengerId) => {
-  const response = await httpClient.get(`/bookings/passengers/${passengerId}/bookings`);
-  return response.data;
+// get all bookings for a passenger
+export const getPassengerBookings = (passengerId) => {
+  return httpClient.get(`/bookings/passengers/${passengerId}/bookings`)
+    .then(res => res.data);
 };
 
-/**
- * Get a single ticket by ID
- */
+// get a single ticket
+// TODO: add error handling for when ticket doesn't exist
 export const getTicket = async (id) => {
-  const response = await httpClient.get(`/tickets/${id}`);
-  return response.data;
+  const res = await httpClient.get(`/tickets/${id}`);
+  return res.data;
 };
 
-/**
- * Cancel a ticket with a reason
- */
-export const cancelTicket = async (ticketId, reason) => {
-  const response = await httpClient.post(`/tickets/${ticketId}/cancel`, { reason });
-  return response.data;
+// cancel a ticket with a reason
+export const cancelTicket = (ticketId, reason) => {
+  return httpClient.post(`/tickets/${ticketId}/cancel`, { reason })
+    .then(res => res.data);
 };

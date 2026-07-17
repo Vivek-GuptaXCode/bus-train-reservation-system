@@ -3,8 +3,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from '../components/common/ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
 
-// Lazy import pages so they only load when needed
-// (Or just import them directly - keeping it simple for a student project)
+// i just import all the pages here, lazy loading was being weird
+// maybe figure out React.lazy() later
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import SearchPage from '../pages/SearchPage';
@@ -20,7 +20,7 @@ import ServicesPage from '../pages/ServicesPage';
 import ServiceRunsPage from '../pages/ServiceRunsPage';
 import ReportsPage from '../pages/ReportsPage';
 
-// Fallback home redirect based on auth status
+// home redirect - sends logged in users to search, others to login
 const HomeRedirect = () => {
   const { isAuthenticated } = useAuth();
   if (isAuthenticated) {
@@ -29,15 +29,17 @@ const HomeRedirect = () => {
   return <Navigate to="/login" replace />;
 };
 
+// all our app routes in one place
+// FIXME: some routes might need different allowedRoles depending on business logic
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public routes */}
+      {/* Public routes - anyone can hit these */}
       <Route path="/" element={<HomeRedirect />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* Search routes - passengers, booking clerks, and admins can search */}
+      {/* Search stuff - passengers, clerks, and admins can all search */}
       <Route
         path="/search"
         element={
@@ -54,6 +56,9 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+
+      {/* Seat selection - this is the page after search results */}
+      {/* TODO: add a back button on this page so users can change their search */}
       <Route
         path="/service-runs/:id/seats"
         element={
@@ -63,7 +68,7 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Booking routes */}
+      {/* Booking and ticket detail pages */}
       <Route
         path="/bookings/:id"
         element={
@@ -81,7 +86,7 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Passenger routes */}
+      {/* Passenger-only stuff */}
       <Route
         path="/passenger/bookings"
         element={
@@ -91,7 +96,7 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Booking Clerk routes */}
+      {/* Booking Clerk pages */}
       <Route
         path="/clerk/bookings/new"
         element={
@@ -101,7 +106,7 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Operations routes */}
+      {/* Operations management - for ops staff and admins */}
       <Route
         path="/operations/routes"
         element={
@@ -135,7 +140,26 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Reports - admin only */}
+      {/* Reports page - admin only for now */}
+      {/* 
+      // maybe add these later
+      <Route
+        path="/operations/service-runs/:id"
+        element={
+          <ProtectedRoute allowedRoles={['Operations Staff', 'Admin']}>
+            <ServiceRunDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      */}
       <Route
         path="/reports"
         element={
@@ -145,7 +169,7 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Catch-all for unknown routes */}
+      {/* 404 for anything else */}
       <Route path="*" element={<div className="container text-center mt-2"><h2>404 - Page Not Found</h2></div>} />
     </Routes>
   );

@@ -4,9 +4,7 @@
 const pool = require('../../db/pool');
 const { notFound, conflict } = require('../../shared/errors');
 
-/**
- * Get all transports
- */
+// get all transports
 async function getAllTransports() {
   const result = await pool.query(
     'SELECT * FROM transport ORDER BY transport_number'
@@ -14,9 +12,7 @@ async function getAllTransports() {
   return result.rows;
 }
 
-/**
- * Get a transport by ID, including its seats
- */
+// get a transport by ID, including its seats
 async function getTransportById(transportId) {
   const transportResult = await pool.query(
     'SELECT * FROM transport WHERE transport_id = $1',
@@ -40,10 +36,7 @@ async function getTransportById(transportId) {
   return transport;
 }
 
-/**
- * Create a new transport
- * @param {Object} data - { transport_type, transport_number, capacity }
- */
+// create a new transport
 async function createTransport(data) {
   const { transport_type, transport_number, capacity } = data;
 
@@ -57,9 +50,7 @@ async function createTransport(data) {
   return result.rows[0];
 }
 
-/**
- * Update a transport
- */
+// update a transport
 async function updateTransport(transportId, updates) {
   // Check transport exists
   const checkResult = await pool.query(
@@ -109,9 +100,7 @@ async function updateTransport(transportId, updates) {
   return result.rows[0];
 }
 
-/**
- * Get seats for a transport, ordered by seat_no
- */
+// get seats for a transport, ordered by seat_no
 async function getTransportSeats(transportId) {
   // Check transport exists
   const checkResult = await pool.query(
@@ -131,10 +120,7 @@ async function getTransportSeats(transportId) {
   return result.rows;
 }
 
-/**
- * Create a single seat for a transport
- * Checks capacity before inserting
- */
+// create a single seat for a transport - checks capacity first
 async function createSeat(transportId, data) {
   const { seat_no } = data;
 
@@ -176,14 +162,7 @@ async function createSeat(transportId, data) {
   return result.rows[0];
 }
 
-/**
- * Generate multiple seats for a transport programmatically.
- * Generates seat numbers like "1A", "1B", "2A", "2B", etc.
- * For a bus with 3 rows and 2 columns: 1A, 1B, 2A, 2B, 3A, 3B
- *
- * @param {number} transportId
- * @param {number} count - Number of seats to generate
- */
+// generate seats for a transport - creates seat numbers like 1A, 1B, 2A, etc
 async function generateSeats(transportId, count) {
   // Get transport info
   const transportResult = await pool.query(
@@ -220,7 +199,7 @@ async function generateSeats(transportId, count) {
   let currentRow = 1;
   let currentCol = 0;
 
-  for (let i = 1; i <= count; i++) {
+  for (var i = 1; i <= count; i++) {
     // Generate seat number
     const seatLetter = String.fromCharCode(65 + currentCol); // 65 = 'A' in ASCII
     const seatNo = currentRow + seatLetter;
@@ -238,8 +217,8 @@ async function generateSeats(transportId, count) {
   // FIXME: should probably wrap this in a transaction
   const insertedSeats = [];
 
-  for (let i = 0; i < seats.length; i++) {
-    const result = await pool.query(
+  for (var i = 0; i < seats.length; i++) {
+    var result = await pool.query(
       `INSERT INTO seat (seat_no, transport_id)
        VALUES ($1, $2)
        RETURNING *`,

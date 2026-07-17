@@ -5,15 +5,7 @@ const pool = require('../../db/pool');
 const config = require('../../config/env');
 const { notFound, badRequest } = require('../../shared/errors');
 
-/**
- * Search for available service runs between two stops on a given date.
- *
- * @param {Object} params
- * @param {number} params.boardingStopId - The route_stop_id to board at
- * @param {number} params.disembarkingStopId - The route_stop_id to get off at
- * @param {string} params.travelDate - Date in YYYY-MM-DD format
- * @param {number} params.passengerCount - Number of passengers
- */
+// searches for available service runs between two stops on a date
 async function searchServices(params) {
   const { boardingStopId, disembarkingStopId, travelDate, passengerCount } = params;
 
@@ -70,8 +62,8 @@ async function searchServices(params) {
   const runs = result.rows;
 
   // Enhance each run with seat count and fare info
-  for (let i = 0; i < runs.length; i++) {
-    const run = runs[i];
+  for (var i = 0; i < runs.length; i++) {
+    let run = runs[i];
 
     // Calculate available seats for this run
     // Count total seats minus occupied ones
@@ -111,14 +103,7 @@ async function searchServices(params) {
   return runs;
 }
 
-/**
- * Get seat availability for a specific service run and route segment.
- * Checks which seats are available (not already booked on overlapping segments).
- *
- * @param {number} serviceRunId
- * @param {number} boardingStopId
- * @param {number} disembarkingStopId
- */
+// gets seat availability for a service run - checks overlapping segments
 async function getSeatAvailability(serviceRunId, boardingStopId, disembarkingStopId) {
   // First, get the route and transport info for this service run
   const runResult = await pool.query(

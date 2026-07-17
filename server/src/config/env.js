@@ -40,10 +40,7 @@ const config = {
   MAX_SEATS_PER_BOOKING: parseInt(process.env.MAX_SEATS_PER_BOOKING, 10) || 6,
 };
 
-/**
- * Checks that the important config values are actually set.
- * Logs warnings for missing stuff but only throws for critical ones.
- */
+// checks that important config values are set - throws on critical errors
 function validateConfig() {
   const warnings = [];
 
@@ -74,6 +71,8 @@ function validateConfig() {
   if (!process.env.CLIENT_ORIGIN) {
     warnings.push('CLIENT_ORIGIN not set, using default: ' + config.CLIENT_ORIGIN);
   }
+
+  // console.log('debug: config warnings count:', warnings.length);
 
   // Print all warnings at once
   if (warnings.length > 0) {

@@ -4,9 +4,7 @@
 const pool = require('../../db/pool');
 const { notFound, badRequest, conflict } = require('../../shared/errors');
 
-/**
- * Get all service runs with joined info about service, transport, and route
- */
+// get all service runs with joined info about service, transport, and route
 async function getAllServiceRuns() {
   const result = await pool.query(
     `SELECT sr.*, s.service_name, s.service_type,
@@ -22,13 +20,7 @@ async function getAllServiceRuns() {
   return result.rows;
 }
 
-/**
- * Create a new service run.
- * Validates service type matches transport type.
- * Checks transport not already in overlapping run.
- *
- * @param {Object} data - { run_id, departure_time, arrival_time, status, transport_id, service_id }
- */
+// create a new service run - validates service type matches transport type
 async function createServiceRun(data) {
   const { run_id, departure_time, arrival_time, status, transport_id, service_id } = data;
 
@@ -99,9 +91,7 @@ async function createServiceRun(data) {
   return result.rows[0];
 }
 
-/**
- * Update a service run
- */
+// update a service run
 async function updateServiceRun(serviceRunId, updates) {
   // Check service run exists
   const checkResult = await pool.query(

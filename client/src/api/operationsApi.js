@@ -1,219 +1,160 @@
 import httpClient from './httpClient';
 
 // ========== Routes ==========
+// these are for managing bus/train routes and their stops
 
-/**
- * Get all routes
- */
+// get all routes
 export const getRoutes = async () => {
-  const response = await httpClient.get('/routes');
-  return response.data;
+  const res = await httpClient.get('/routes');
+  return res.data;
 };
 
-/**
- * Get a single route by ID
- */
-export const getRoute = async (id) => {
-  const response = await httpClient.get(`/routes/${id}`);
-  return response.data;
+// get one route
+export const getRoute = (id) => {
+  return httpClient.get(`/routes/${id}`).then(res => res.data);
 };
 
-/**
- * Create a new route
- */
+// create route
 export const createRoute = async (data) => {
-  const response = await httpClient.post('/routes', data);
-  return response.data;
+  const res = await httpClient.post('/routes', data);
+  return res.data;
 };
 
-/**
- * Update a route
- */
-export const updateRoute = async (id, data) => {
-  const response = await httpClient.patch(`/routes/${id}`, data);
-  return response.data;
+// update a route (partial update)
+// FIXME: sometimes patch doesn't update all fields, maybe use put?
+export const updateRoute = (id, data) => {
+  return httpClient.patch(`/routes/${id}`, data).then(res => res.data);
 };
 
-/**
- * Delete a route
- */
+// delete a route - be careful, this cascades!
 export const deleteRoute = async (id) => {
-  const response = await httpClient.delete(`/routes/${id}`);
-  return response.data;
+  const res = await httpClient.delete(`/routes/${id}`);
+  return res.data;
 };
 
 // ========== Route Stops ==========
 
-/**
- * Get stops for a route
- */
-export const getRouteStops = async (routeId) => {
-  const response = await httpClient.get(`/routes/${routeId}/stops`);
-  return response.data;
+// get stops for a specific route
+export const getRouteStops = (routeId) => {
+  return httpClient.get(`/routes/${routeId}/stops`).then(res => res.data);
 };
 
-/**
- * Create a stop on a route
- */
+// add a stop to a route
 export const createRouteStop = async (routeId, data) => {
-  const response = await httpClient.post(`/routes/${routeId}/stops`, data);
-  return response.data;
+  const res = await httpClient.post(`/routes/${routeId}/stops`, data);
+  return res.data;
 };
 
-/**
- * Update a route stop
- */
-export const updateRouteStop = async (routeStopId, data) => {
-  const response = await httpClient.patch(`/routes/route-stops/${routeStopId}`, data);
-  return response.data;
+// edit a route stop
+export const updateRouteStop = (routeStopId, data) => {
+  return httpClient.patch(`/routes/route-stops/${routeStopId}`, data).then(res => res.data);
 };
 
-/**
- * Delete a route stop
- */
+// remove a stop from a route
 export const deleteRouteStop = async (routeStopId) => {
-  const response = await httpClient.delete(`/routes/route-stops/${routeStopId}`);
-  return response.data;
+  const res = await httpClient.delete(`/routes/route-stops/${routeStopId}`);
+  return res.data;
 };
 
 // ========== Transports ==========
 
-/**
- * Get all transports
- */
+// get all transports (buses/trains)
 export const getTransports = async () => {
-  const response = await httpClient.get('/transports');
-  return response.data;
+  const res = await httpClient.get('/transports');
+  return res.data;
 };
 
-/**
- * Get a single transport
- */
-export const getTransport = async (id) => {
-  const response = await httpClient.get(`/transports/${id}`);
-  return response.data;
+// get one transport by id
+export const getTransport = (id) => {
+  return httpClient.get(`/transports/${id}`).then(res => res.data);
 };
 
-/**
- * Create a new transport
- */
+// add a new transport to the fleet
 export const createTransport = async (data) => {
-  const response = await httpClient.post('/transports', data);
-  return response.data;
+  const res = await httpClient.post('/transports', data);
+  return res.data;
 };
 
-/**
- * Update a transport
- */
-export const updateTransport = async (id, data) => {
-  const response = await httpClient.patch(`/transports/${id}`, data);
-  return response.data;
+// update transport details
+export const updateTransport = (id, data) => {
+  return httpClient.patch(`/transports/${id}`, data).then(res => res.data);
 };
 
-/**
- * Delete a transport
- */
+// remove a transport
 export const deleteTransport = async (id) => {
-  const response = await httpClient.delete(`/transports/${id}`);
-  return response.data;
+  const res = await httpClient.delete(`/transports/${id}`);
+  return res.data;
 };
 
-/**
- * Get seats for a transport
- */
-export const getTransportSeats = async (transportId) => {
-  const response = await httpClient.get(`/transports/${transportId}/seats`);
-  return response.data;
+// get all seats in a transport
+// TODO: this returns way too much data sometimes, need pagination
+export const getTransportSeats = (transportId) => {
+  return httpClient.get(`/transports/${transportId}/seats`).then(res => res.data);
 };
 
-/**
- * Generate seats for a transport
- */
+// auto-generate seats for a transport based on its capacity
 export const generateSeats = async (transportId) => {
-  const response = await httpClient.post(`/transports/${transportId}/seats/generate`);
-  return response.data;
+  const res = await httpClient.post(`/transports/${transportId}/seats/generate`);
+  // console.log('generated seats res:', res);
+  return res.data;
 };
 
 // ========== Services ==========
 
-/**
- * Get all services
- */
+// get all services
 export const getServices = async () => {
-  const response = await httpClient.get('/services');
-  return response.data;
+  const res = await httpClient.get('/services');
+  return res.data;
 };
 
-/**
- * Get a single service
- */
-export const getService = async (id) => {
-  const response = await httpClient.get(`/services/${id}`);
-  return response.data;
+// get one service
+export const getService = (id) => {
+  return httpClient.get(`/services/${id}`).then(res => res.data);
 };
 
-/**
- * Create a service
- */
+// create a new service
 export const createService = async (data) => {
-  const response = await httpClient.post('/services', data);
-  return response.data;
+  const res = await httpClient.post('/services', data);
+  return res.data;
 };
 
-/**
- * Update a service
- */
-export const updateService = async (id, data) => {
-  const response = await httpClient.patch(`/services/${id}`, data);
-  return response.data;
+// update service info
+export const updateService = (id, data) => {
+  return httpClient.patch(`/services/${id}`, data).then(res => res.data);
 };
 
-/**
- * Delete a service
- */
+// delete a service
 export const deleteService = async (id) => {
-  const response = await httpClient.delete(`/services/${id}`);
-  return response.data;
+  const res = await httpClient.delete(`/services/${id}`);
+  return res.data;
 };
 
 // ========== Service Runs ==========
 
-/**
- * Get all service runs
- */
+// get all service runs
 export const getServiceRuns = async () => {
-  const response = await httpClient.get('/service-runs');
-  return response.data;
+  const res = await httpClient.get('/service-runs');
+  return res.data;
 };
 
-/**
- * Get a single service run
- */
-export const getServiceRun = async (id) => {
-  const response = await httpClient.get(`/service-runs/${id}`);
-  return response.data;
+// get one service run
+export const getServiceRun = (id) => {
+  return httpClient.get(`/service-runs/${id}`).then(res => res.data);
 };
 
-/**
- * Create a service run
- */
+// schedule a new service run
 export const createServiceRun = async (data) => {
-  const response = await httpClient.post('/service-runs', data);
-  return response.data;
+  const res = await httpClient.post('/service-runs', data);
+  return res.data;
 };
 
-/**
- * Update a service run
- */
-export const updateServiceRun = async (id, data) => {
-  const response = await httpClient.patch(`/service-runs/${id}`, data);
-  return response.data;
+// update a scheduled run
+export const updateServiceRun = (id, data) => {
+  return httpClient.patch(`/service-runs/${id}`, data).then(res => res.data);
 };
 
-/**
- * Delete a service run
- */
+// cancel/delete a service run
 export const deleteServiceRun = async (id) => {
-  const response = await httpClient.delete(`/service-runs/${id}`);
-  return response.data;
+  const res = await httpClient.delete(`/service-runs/${id}`);
+  return res.data;
 };

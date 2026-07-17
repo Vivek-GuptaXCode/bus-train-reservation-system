@@ -3,21 +3,19 @@
 // These are the rules that decide things like refund amounts and limits
 
 // Maximum number of tickets you can buy in one booking
-const MAX_TICKETS_PER_BOOKING = 6;
+var MAX_TICKETS_PER_BOOKING = 6;
 
 // Maximum number of seats you can reserve in one booking
-const MAX_SEATS_PER_BOOKING = 6;
+var MAX_SEATS_PER_BOOKING = 6;
 
-/**
- * Refund policy bands.
- * Each band has:
- *   - hoursBefore: the minimum hours before departure for this band
- *   - percentage: the percentage of fare that will be refunded
- *
- * The list is sorted from highest hours to lowest.
- * Example: if you cancel 50 hours before, you get 80% back.
- * If you cancel 2 hours before, you get 25% back.
- */
+// Refund policy bands.
+// Each band has:
+//   - hoursBefore: the minimum hours before departure for this band
+//   - percentage: the percentage of fare that will be refunded
+//
+// The list is sorted from highest hours to lowest.
+// Example: if you cancel 50 hours before, you get 80% back.
+// If you cancel 2 hours before, you get 25% back.
 let refundPolicyBands = [];
 
 // Try to parse the refund policy from environment
@@ -46,13 +44,7 @@ refundPolicyBands.sort(function (a, b) {
   return b.hoursBefore - a.hoursBefore;
 });
 
-/**
- * Figures out what percentage of the fare to refund
- * based on how many hours before departure the cancellation happens.
- *
- * @param {number} hoursBeforeDeparture - How many hours until departure
- * @returns {number} The refund percentage (0 to 100)
- */
+// figures out refund percentage based on hours before departure
 function getRefundPercentage(hoursBeforeDeparture) {
   // FIXME: what if someone passes a negative number? should probably handle that
   if (hoursBeforeDeparture < 0) {

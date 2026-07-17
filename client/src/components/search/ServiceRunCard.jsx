@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 
 /**
  * ServiceRunCard - shows info about a single service run in search results
+ * Clicking "Select Seats" goes to the seat selection page
  */
 function ServiceRunCard({ serviceRun, boardingStopId, disembarkingStopId, passengerCount }) {
   const navigate = useNavigate();
 
-  // format the date to be more readable
+  // make the date look nicer for display
   const formatDate = (dateStr) => {
     if (!dateStr) return 'N/A';
     try {
@@ -23,11 +24,10 @@ function ServiceRunCard({ serviceRun, boardingStopId, disembarkingStopId, passen
     }
   };
 
-  // format time
+  // format time string to HH:MM
   const formatTime = (timeStr) => {
     if (!timeStr) return 'N/A';
     try {
-      // time might be a full timestamp or just time
       const date = new Date(timeStr);
       return date.toLocaleTimeString('en-IN', {
         hour: '2-digit',
@@ -38,14 +38,15 @@ function ServiceRunCard({ serviceRun, boardingStopId, disembarkingStopId, passen
     }
   };
 
+  // navigate to seat selection page with query params
   const handleSelect = () => {
-    // navigate to seat selection
+    // console.log('user selected run:', serviceRun.service_run_id);
     navigate(
-      `/seat-selection/${serviceRun.service_run_id}?boardingStopId=${boardingStopId}&disembarkingStopId=${disembarkingStopId}&passengerCount=${passengerCount || 1}`
+      `/service-runs/${serviceRun.service_run_id}/seats?boardingStopId=${boardingStopId}&disembarkingStopId=${disembarkingStopId}&passengerCount=${passengerCount || 1}`
     );
   };
 
-  // get badge class based on transport type
+  // different badge color for bus vs train
   const getBadgeClass = (type) => {
     if (!type) return '';
     return type.toLowerCase() === 'bus' ? 'badge badge-bus' : 'badge badge-train';
@@ -62,6 +63,7 @@ function ServiceRunCard({ serviceRun, boardingStopId, disembarkingStopId, passen
             </span>
           </h3>
 
+          {/* transport and route info */}
           <div className="flex-row" style={{ marginBottom: '8px' }}>
             <div>
               <strong>Transport:</strong> {serviceRun.transport_number || 'N/A'} 
@@ -72,6 +74,7 @@ function ServiceRunCard({ serviceRun, boardingStopId, disembarkingStopId, passen
             </div>
           </div>
 
+          {/* date and times */}
           <div className="flex-row" style={{ marginBottom: '8px' }}>
             <div>
               <strong>Date:</strong> {formatDate(serviceRun.departure_time)}
@@ -84,6 +87,7 @@ function ServiceRunCard({ serviceRun, boardingStopId, disembarkingStopId, passen
             </div>
           </div>
 
+          {/* seat availability - TODO: this sometimes shows wrong count, need to fix */}
           {serviceRun.available_seats !== undefined && (
             <div style={{ marginBottom: '8px' }}>
               <strong>Available Seats:</strong> {serviceRun.available_seats}
@@ -91,6 +95,7 @@ function ServiceRunCard({ serviceRun, boardingStopId, disembarkingStopId, passen
             </div>
           )}
 
+          {/* status badge with color */}
           <div>
             <strong>Status:</strong>{' '}
             <span style={{ 
@@ -103,8 +108,8 @@ function ServiceRunCard({ serviceRun, boardingStopId, disembarkingStopId, passen
           </div>
         </div>
 
+        {/* price and select button */}
         <div style={{ textAlign: 'center', minWidth: '120px' }}>
-          {/* show fare estimate if available */}
           {serviceRun.estimated_fare && (
             <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#007bff', marginBottom: '10px' }}>
               ₹{parseFloat(serviceRun.estimated_fare).toFixed(2)}

@@ -4,9 +4,8 @@
 const pool = require('../../db/pool');
 const { notFound } = require('../../shared/errors');
 
-/**
- * Get all services with their route info joined
- */
+// TODO: add better error handling
+// get all services with their route info joined
 async function getAllServices() {
   const result = await pool.query(
     `SELECT s.*, r.route_name
@@ -18,9 +17,7 @@ async function getAllServices() {
   return result.rows;
 }
 
-/**
- * Get a single service by ID with route info
- */
+// get a single service by ID with route info
 async function getServiceById(serviceId) {
   const result = await pool.query(
     `SELECT s.*, r.route_name, r.total_distance
@@ -37,10 +34,7 @@ async function getServiceById(serviceId) {
   return result.rows[0];
 }
 
-/**
- * Create a new service
- * @param {Object} data - { service_name, service_type, status, route_id }
- */
+// create a new service
 async function createService(data) {
   const { service_name, service_type, status, route_id } = data;
 
@@ -54,9 +48,7 @@ async function createService(data) {
   return result.rows[0];
 }
 
-/**
- * Update an existing service
- */
+// update an existing service
 async function updateService(serviceId, updates) {
   // Check service exists
   const checkResult = await pool.query(
