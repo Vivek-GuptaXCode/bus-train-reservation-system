@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+client/dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Storage (uploads)
+storage/identification-documents/*
+storage/e-tickets/*
+!storage/*/.gitkeep
+
+# Database backups
+database/backup/*.dump
+database/backup/*.sql
+!database/backup/.gitkeep
+
+# Certificates
+*.pem
+*.key
+*.crt
+
+# Docker
+docker-compose.override.yml

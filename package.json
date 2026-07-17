@@ -1,0 +1,20 @@
+{
+  "name": "bus-train-reservation-system",
+  "version": "1.0.0",
+  "description": "Bus and Train Reservation System - PERN Stack DBMS Academic Project",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "migrate": "cd server && npm run migrate",
+    "seed": "cd server && npm run seed",
+    "setup": "npm run migrate && npm run seed",
+    "test": "cd server && npm test",
+    "build": "cd client && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
