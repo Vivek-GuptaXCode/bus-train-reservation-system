@@ -64,7 +64,7 @@ CREATE TABLE passenger (
 -- TABLE 4: identification_document
 -- Stores ID proof documents that passengers can upload.
 -- ============================================================================
-CREATE TABLE identification_document (
+/*CREATE TABLE identification_document (
     document_id bigint GENERATED ALWAYS AS IDENTITY,
     doc_type    varchar(80) NOT NULL,
     doc_url     text NOT NULL,
