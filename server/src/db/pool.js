@@ -21,6 +21,7 @@ pool.on('error', function (err) {
 // helper to run a query - this is the main way to talk to the database
 async function query(text, params) {
   // Just delegate to the pool - pg handles everything
+  console.log(pool.query === query);
   var start = Date.now();
   try {
     var result = await pool.query(text, params);
